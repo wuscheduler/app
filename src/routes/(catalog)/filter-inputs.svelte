@@ -18,7 +18,7 @@
 	interface Props {
 		filters?: FilterData;
 		mobile?: boolean;
-		catalogLastUpdated: Number | Date
+		catalogLastUpdated: number | Date;
 	}
 
 	let {
@@ -34,7 +34,11 @@
 		catalogLastUpdated
 	}: Props = $props();
 
-	let instructors = $derived(catalogState.catalog?.instructors.filter((x) => x !== ''));
+	let instructors = $derived(
+		Object.keys(catalogState.catalog?.instructors || {})
+			.filter((x) => x !== '')
+			.sort()
+	);
 	let schools = $derived(Object.keys(catalogState.index?.schools || {}));
 	let departments = $derived(
 		filters.school ? catalogState.index?.schools[filters.school] : undefined

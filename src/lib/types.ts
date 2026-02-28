@@ -26,7 +26,7 @@ export interface Course {
 
 export interface Catalog {
 	courses: Course[];
-	instructors: string[];
+	instructors: Record<string, string[]>;
 	lastUpdated: number;
 }
 

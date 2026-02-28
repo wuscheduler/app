@@ -13,6 +13,8 @@
 	import { Input } from '$lib/components/ui/input';
 	import type { Course } from '$lib/types';
 
+	import SvelteVirtualList from '@humanspeak/svelte-virtual-list';
+
 	let filters = $state<FilterData>({
 		term: undefined,
 		school: undefined,
@@ -22,13 +24,27 @@
 	});
 
 	let catalogLastUpdated = $derived(catalogState.catalog?.lastUpdated || 0);
-	let courses = $derived(
-		Array.from(catalogState.courses)
-			.sort((a, b) => a.catalogNumber.localeCompare(b.catalogNumber))
-			.filter((course) => course.title)
-	);
-
 	let selectedCourse = $state<Course | null>(null);
+
+	// Chained derived's reduce redundant calculations
+	let baseCourses = $derived(catalogState.courses);
+	let coursesFilteredSchool = $derived(
+		filters.school ? baseCourses.filter((c) => c.school === filters.school) : baseCourses
+	);
+	let coursesFilteredDept = $derived(
+		filters.department
+			? coursesFilteredSchool.filter((c) => c.department === filters.department)
+			: coursesFilteredSchool
+	);
+	let coursesFilteredInstructors = $derived.by(() => {
+		const courses = coursesFilteredDept;
+		if (!filters.instructors || filters.instructors.length === 0) return courses;
+		const ids = new Set(
+			filters.instructors.flatMap((i) => catalogState.catalog?.instructors[i] || '')
+		);
+		return courses.filter((c) => ids.has(c.id));
+	});
+	let courses = $derived(coursesFilteredInstructors);
 
 	onMount(async () => {
 		await catalogState.loadIndex();
@@ -50,11 +66,11 @@
 {:else if catalogState.error || !catalogState.catalog}
 	An error occurred: {catalogState.error}
 {:else}
-	<div class="lg:flex">
+	<div class="flex h-full flex-col lg:flex-row">
 		<!--Filter inputs on desktop-->
 		<aside class="hidden lg:block lg:w-64 lg:shrink-0 lg:border-r">
-			<div class="sticky top-0 h-screen overflow-y-auto bg-background p-4">
-				<FilterInputs bind:filters catalogLastUpdated={catalogLastUpdated}></FilterInputs>
+			<div class="h-full overflow-y-auto bg-background p-4">
+				<FilterInputs bind:filters {catalogLastUpdated}></FilterInputs>
 			</div>
 		</aside>
 
@@ -87,37 +103,40 @@
 
 			<Drawer.Content class="lg:hidden">
 				<div class="overflow-y-auto px-4 pb-2">
-					<FilterInputs bind:filters mobile catalogLastUpdated={catalogLastUpdated}></FilterInputs>
+					<FilterInputs bind:filters mobile {catalogLastUpdated}></FilterInputs>
 				</div>
 			</Drawer.Content>
 		</Drawer.Root>
 
 		<!--Course list-->
-		<main class="flex-1">
+		<main class="flex min-h-0 flex-1 flex-col">
 			<p class="px-2 pt-2 text-sm text-muted-foreground">Showing {courses.length} courses</p>
-			<div class="overflow-y-auto">
-				{#each courses as course}
-					<div class="course px-2 pt-3">
-						<Item.Root
-							variant="outline"
-							class="cursor-pointer hover:bg-muted/50"
-							onclick={() => (selectedCourse = course)}
-						>
-							<Item.Content>
-								<Item.Title>{course.catalogNumber}</Item.Title>
-								<Item.Description>{course.title}</Item.Description>
-								<Item.Description
-									>{course.units ?? 'Variable'} Credit{course.units == 1
-										? ''
-										: 's'} &bull; {course.school}</Item.Description
-								>
-							</Item.Content>
-							<Item.Actions>
-								<Button variant="outline">Add Course</Button>
-							</Item.Actions>
-						</Item.Root>
-					</div>
-				{/each}
+			<div class="min-h-0 flex-1">
+				<SvelteVirtualList items={courses}>
+					{#snippet renderItem(item)}
+						{@const course = item}
+						<div class="course px-2 pt-3">
+							<Item.Root
+								variant="outline"
+								class="cursor-pointer hover:bg-muted/50"
+								onclick={() => (selectedCourse = course)}
+							>
+								<Item.Content>
+									<Item.Title>{course.catalogNumber}</Item.Title>
+									<Item.Description>{course.title}</Item.Description>
+									<Item.Description
+										>{course.units ?? 'Variable'} Credit{course.units == 1
+											? ''
+											: 's'} &bull; {course.school}</Item.Description
+									>
+								</Item.Content>
+								<Item.Actions>
+									<Button variant="outline">Add Course</Button>
+								</Item.Actions>
+							</Item.Root>
+						</div>
+					{/snippet}
+				</SvelteVirtualList>
 			</div>
 		</main>
 
@@ -130,7 +149,7 @@
 				'lg:block lg:flex-1 lg:shrink-0 lg:border-l'
 			)}
 		>
-			<div class="lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto">
+			<div class="lg:h-full lg:overflow-y-auto">
 				<CourseDetails bind:course={selectedCourse}></CourseDetails>
 			</div>
 		</aside>
