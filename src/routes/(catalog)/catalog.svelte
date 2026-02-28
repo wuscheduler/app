@@ -12,7 +12,6 @@
 	import { cn } from '$lib/utils';
 	import { Input } from '$lib/components/ui/input';
 	import type { Course } from '$lib/types';
-
 	import SvelteVirtualList from '@humanspeak/svelte-virtual-list';
 
 	let filters = $state<FilterData>({
@@ -44,7 +43,15 @@
 		);
 		return courses.filter((c) => ids.has(c.id));
 	});
-	let courses = $derived(coursesFilteredInstructors);
+	let coursesFilteredSearch = $derived.by(() => {
+		const courses = coursesFilteredInstructors;
+		if (!filters.search) return courses;
+		const s = filters.search.toLowerCase();
+		return courses.filter(
+			(c) => c.catalogNumber.toLowerCase().includes(s) || c.title.toLowerCase().includes(s)
+		);
+	});
+	let courses: Course[] = $derived(coursesFilteredSearch);
 
 	onMount(async () => {
 		await catalogState.loadIndex();
