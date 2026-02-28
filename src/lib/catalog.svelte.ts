@@ -40,6 +40,9 @@ const loadTerm = async (term: string) => {
 			throw new Error(`Failed to load ${term}: ${res.statusText}<br/>${await res.text()}`);
 
 		const data: Catalog = await res.json();
+		data.courses = data.courses
+			.filter((c) => c.title !== '')
+			.sort((a, b) => a.catalogNumber.localeCompare(b.catalogNumber));
 		cache.set(term, data);
 		activeTerm = term;
 		catalog = data;
