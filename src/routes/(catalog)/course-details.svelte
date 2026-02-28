@@ -1,15 +1,13 @@
 <script lang="ts">
-	import type { Course } from '$lib/types';
+	import type { Course, Section } from '$lib/types';
 	import XIcon from '@lucide/svelte/icons/x';
+	import CourseSection from './course-section.svelte';
 
 	interface Props {
 		course: Course | null;
 	}
 
 	let { course = $bindable() }: Props = $props();
-	const formatTime = (time: number): string => {
-		return time.toString();
-	};
 </script>
 
 {#if course}
@@ -70,71 +68,22 @@
 		</div>
 
 		<!-- Sections -->
-		<!-- <div>
+		<div>
 			<h3 class="mb-3 text-lg font-semibold">
 				Sections ({course.sections.lecture.length + (course.sections.lab?.length || 0)})
 			</h3>
 
 			<div class="space-y-3">
-				{#each getAllSections(course) as { section, type } (section.id)}
-					<div class="rounded-md border bg-muted/50 p-4">
-						<div class="mb-2 flex items-start justify-between">
-							<div>
-								<span class="font-medium">{type} {section.number}</span>
-								<span class="ml-2 text-sm text-muted-foreground"
-									>• {section.term}</span
-								>
-							</div>
-							{#if section.seats}
-								<span
-									class="text-sm"
-									class:text-destructive={section.seats[0] >= section.seats[1]}
-									class:text-green-600={section.seats[0] < section.seats[1]}
-								>
-									{section.seats[0]}/{section.seats[1]} seats taken
-								</span>
-							{/if}
-						</div>
-
-						<div class="space-y-1 text-sm">
-							{#if section.instructor.length > 0}
-								<div>
-									<span class="font-medium">Instructor:</span>
-									<span class="ml-2 text-muted-foreground">
-										{section.instructor.join(', ')}
-									</span>
-								</div>
-							{/if}
-
-							{#if section.days && section.days.length > 0}
-								<div>
-									<span class="font-medium">Days:</span>
-									<span class="ml-2 text-muted-foreground">
-										{section.days.join(', ')}
-									</span>
-								</div>
-							{/if}
-
-							{#if section.time}
-								<div>
-									<span class="font-medium">Time:</span>
-									<span class="ml-2 text-muted-foreground">
-										{formatTime(section.time[0])} - {formatTime(
-											section.time[1]
-										)}
-									</span>
-								</div>
-							{/if}
-
-							<div>
-								<span class="font-medium">Delivery:</span>
-								<span class="ml-2 text-muted-foreground">{section.delivery}</span>
-							</div>
-						</div>
-					</div>
+				{#each course.sections.lecture as section (section.id)}
+					<CourseSection {section} type="Lecture"></CourseSection>
 				{/each}
+				{#if course.sections.lab}
+					{#each course.sections.lab as section (section.id)}
+						<CourseSection {section} type="Lab"></CourseSection>
+					{/each}
+				{/if}
 			</div>
-		</div> -->
+		</div>
 	</div>
 {:else}
 	<!-- Empty state when no course selected -->
