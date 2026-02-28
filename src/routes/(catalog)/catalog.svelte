@@ -21,6 +21,7 @@
 		search: ''
 	});
 
+	let catalogLastUpdated = $derived(catalogState.catalog?.lastUpdated || 0);
 	let courses = $derived(
 		Array.from(catalogState.courses)
 			.sort((a, b) => a.catalogNumber.localeCompare(b.catalogNumber))
@@ -53,7 +54,7 @@
 		<!--Filter inputs on desktop-->
 		<aside class="hidden lg:block lg:w-64 lg:shrink-0 lg:border-r">
 			<div class="sticky top-0 h-screen overflow-y-auto bg-background p-4">
-				<FilterInputs bind:filters></FilterInputs>
+				<FilterInputs bind:filters catalogLastUpdated={catalogLastUpdated}></FilterInputs>
 			</div>
 		</aside>
 
@@ -86,12 +87,14 @@
 
 			<Drawer.Content class="lg:hidden">
 				<div class="overflow-y-auto px-4 pb-2">
-					<FilterInputs bind:filters mobile></FilterInputs>
+					<FilterInputs bind:filters mobile catalogLastUpdated={catalogLastUpdated}></FilterInputs>
 				</div>
 			</Drawer.Content>
 		</Drawer.Root>
 
+		<!--Course list-->
 		<main class="flex-1">
+			<p class="px-2 pt-2 text-sm text-muted-foreground">Showing {courses.length} courses</p>
 			<div class="overflow-y-auto">
 				{#each courses as course}
 					<div class="course px-2 pt-3">
@@ -118,6 +121,7 @@
 			</div>
 		</main>
 
+		<!--Detail panel as sidebar on lg and overlay on md/sm-->
 		<aside
 			class={cn(
 				!selectedCourse && 'hidden',

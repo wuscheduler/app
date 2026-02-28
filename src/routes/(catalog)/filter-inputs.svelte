@@ -13,10 +13,12 @@
 	import FilterCombobox from '$lib/components/filter-combobox.svelte';
 	import MultiCombobox from '$lib/components/multi-combobox.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
+	import { getRelativeTimeString } from '$lib/utils';
 
 	interface Props {
 		filters?: FilterData;
 		mobile?: boolean;
+		catalogLastUpdated: Number | Date
 	}
 
 	let {
@@ -28,7 +30,8 @@
 			search: ''
 		}),
 
-		mobile = undefined
+		mobile = undefined,
+		catalogLastUpdated
 	}: Props = $props();
 
 	let instructors = $derived(catalogState.catalog?.instructors.filter((x) => x !== ''));
@@ -79,3 +82,7 @@
 	items={instructors || []}
 	bind:value={filters.instructors}
 ></MultiCombobox>
+
+<p class="text-sm text-muted-foreground">
+	Last updated {getRelativeTimeString(catalogLastUpdated)}
+</p>

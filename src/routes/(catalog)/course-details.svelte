@@ -10,8 +10,6 @@
 	const formatTime = (time: number): string => {
 		return time.toString();
 	};
-
-	// Helper to get all sections (both lecture and lab)
 </script>
 
 {#if course}
