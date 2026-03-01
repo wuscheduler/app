@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { catalogState } from '$lib/catalog.svelte';
+	import { catalogState, selectedCourses } from '$lib/catalog.svelte';
 	import Loader from './loader.svelte';
 	import FilterInputs, { type FilterData } from './filter-inputs.svelte';
 	import FilterIcon from '@lucide/svelte/icons/filter';
@@ -126,7 +126,10 @@
 							<Item.Root
 								variant="outline"
 								class="cursor-pointer hover:bg-muted/50"
-								onclick={() => (selectedCourse = course)}
+								onclick={(e) => {
+									e.preventDefault();
+									selectedCourse = course;
+								}}
 							>
 								<Item.Content>
 									<Item.Title>{course.catalogNumber}</Item.Title>
@@ -138,7 +141,23 @@
 									>
 								</Item.Content>
 								<Item.Actions>
-									<Button variant="outline">Add Course</Button>
+									{#if selectedCourses.has(course.id)}
+										<Button
+											variant="destructive"
+											onclick={(e) => {
+												e.stopPropagation();
+												selectedCourses.delete(course.id);
+											}}>Remove Course</Button
+										>
+									{:else}
+										<Button
+											variant="outline"
+											onclick={(e) => {
+												e.stopPropagation();
+												selectedCourses.add(course.id);
+											}}>Add Course</Button
+										>
+									{/if}
 								</Item.Actions>
 							</Item.Root>
 						</div>

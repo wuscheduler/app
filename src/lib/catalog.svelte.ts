@@ -1,4 +1,4 @@
-import { SvelteMap } from 'svelte/reactivity';
+import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 import type { Catalog, Index } from './types';
 
 const cache = new SvelteMap<string, Catalog>();
@@ -75,3 +75,6 @@ export const catalogState = {
 	loadTerm,
 	loadIndex
 };
+
+
+export const selectedCourses = new SvelteSet<string>();
