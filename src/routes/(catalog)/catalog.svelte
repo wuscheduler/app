@@ -19,6 +19,7 @@
 		school: undefined,
 		department: undefined,
 		instructors: [],
+		level: undefined,
 		search: ''
 	});
 
@@ -35,8 +36,13 @@
 			? coursesFilteredSchool.filter((c) => c.department === filters.department)
 			: coursesFilteredSchool
 	);
+	let coursesFilteredLevel = $derived(
+		filters.level
+			? coursesFilteredDept.filter((c) => c.level === filters.level)
+			: coursesFilteredDept
+	);
 	let coursesFilteredInstructors = $derived.by(() => {
-		const courses = coursesFilteredDept;
+		const courses = coursesFilteredLevel;
 		if (!filters.instructors || filters.instructors.length === 0) return courses;
 		const ids = new Set(
 			filters.instructors.flatMap((i) => catalogState.catalog?.instructors[i] || '')

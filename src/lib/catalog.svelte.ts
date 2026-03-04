@@ -46,6 +46,11 @@ const loadTerm = async (term: string) => {
 		cache.set(term, data);
 		activeTerm = term;
 		catalog = data;
+
+		for (const course of data.courses) {
+			const s = course.catalogNumber;
+			course.number = Number(s.slice(s.lastIndexOf(' ') + 1)) || 0;
+		}
 	} catch (e) {
 		error = (e as Error).message;
 	} finally {
@@ -75,6 +80,5 @@ export const catalogState = {
 	loadTerm,
 	loadIndex
 };
-
 
 export const selectedCourses = new SvelteSet<string>();

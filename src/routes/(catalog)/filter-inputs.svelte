@@ -4,6 +4,7 @@
 		school: string | undefined;
 		department: string | undefined;
 		instructors: string[];
+		level: 'Graduate' | 'Undergraduate' | undefined;
 		search: string;
 	}
 </script>
@@ -27,6 +28,7 @@
 			school: undefined,
 			department: undefined,
 			instructors: [],
+			level: undefined,
 			search: ''
 		}),
 
@@ -78,6 +80,14 @@
 	bind:value={filters.department}
 	clearable={true}
 	disabled={!departments || departments.length === 0}
+></FilterCombobox>
+
+<FilterCombobox
+	label="Level"
+	placeholder="Select a level..."
+	items={['Undergraduate', 'Graduate']}
+	bind:value={filters.level}
+	clearable={true}
 ></FilterCombobox>
 
 <MultiCombobox
