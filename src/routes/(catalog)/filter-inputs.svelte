@@ -39,9 +39,9 @@
 			.filter((x) => x !== '')
 			.sort()
 	);
-	let schools = $derived(Object.keys(catalogState.index?.schools || {}));
+	let schools = $derived(Object.keys(catalogState.catalog?.schools || {}));
 	let departments = $derived(
-		filters.school ? catalogState.index?.schools[filters.school] : undefined
+		filters.school ? catalogState.catalog?.schools[filters.school] : undefined
 	);
 
 	$effect(() => {

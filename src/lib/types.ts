@@ -27,10 +27,10 @@ export interface Course {
 export interface Catalog {
 	courses: Course[];
 	instructors: Record<string, string[]>;
+	schools: Record<string, string[]>;
 	lastUpdated: number;
 }
 
 export interface Index {
 	terms: string[];
-	schools: Record<string, string[]>;
 }
