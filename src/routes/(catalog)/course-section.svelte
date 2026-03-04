@@ -34,7 +34,7 @@
 			<div>
 				<span class="font-medium">Instructor:</span>
 				<span class="ml-2 text-muted-foreground">
-					{section.instructor.join(', ')}
+					{section.instructor.join('; ')}
 				</span>
 			</div>
 		{/if}
