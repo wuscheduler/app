@@ -177,7 +177,7 @@
 			class={cn(
 				!selectedCourse && 'hidden',
 				'bg-background p-4 md:p-6',
-				'max-lg:fixed max-lg:inset-0 max-lg:z-50',
+				'max-lg:fixed max-lg:inset-0 max-lg:z-50 max-lg:overflow-y-scroll',
 				'lg:block lg:flex-1 lg:shrink-0 lg:border-l'
 			)}
 		>
