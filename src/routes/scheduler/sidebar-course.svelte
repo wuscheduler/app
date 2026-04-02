@@ -14,13 +14,12 @@
 		hidden: boolean;
 		selectedLectureId: string | null;
 		selectedLabId: string | null;
-		highlightedCourseId: string | null;
 		onSetLecture: (id: string | null) => void;
 		onSetLab: (id: string | null) => void;
 		onToggleHidden: () => void;
 		onRemove: () => void;
-		onMouseEnter: () => void;
-		onMouseLeave: () => void;
+		onSectionHover: (section: Section, type: 'lecture' | 'lab') => void;
+		onSectionLeave: () => void;
 	}
 
 	let {
@@ -29,16 +28,15 @@
 		hidden,
 		selectedLectureId,
 		selectedLabId,
-		highlightedCourseId,
 		onSetLecture,
 		onSetLab,
 		onToggleHidden,
 		onRemove,
-		onMouseEnter,
-		onMouseLeave
+		onSectionHover,
+		onSectionLeave
 	}: Props = $props();
 
-	let expanded = $state(false);
+	let expanded = $state(true);
 
 	function sectionLabel(section: Section): string {
 		const parts: string[] = [];
@@ -49,13 +47,7 @@
 	}
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<div
-	class="group"
-	onmouseenter={onMouseEnter}
-	onmouseleave={onMouseLeave}
-	role="listitem"
->
+<div role="listitem">
 	<!-- Course card header -->
 	<div
 		class="flex items-stretch rounded-md overflow-hidden border bg-card transition-colors"
@@ -150,7 +142,9 @@
 							{@const selected = selectedLectureId === section.id}
 							<button
 								type="button"
-								onclick={() => onSetLecture(selected ? null : section.id)}
+								onclick={() => { onSectionLeave(); onSetLecture(selected ? null : section.id); }}
+								onmouseenter={() => { if (!selected) onSectionHover(section, 'lecture'); }}
+								onmouseleave={onSectionLeave}
 								class="w-full text-left flex items-start gap-2 px-2 py-1.5 rounded-sm text-xs transition-colors hover:bg-muted/70"
 								class:bg-muted={selected}
 							>
@@ -188,7 +182,9 @@
 							{@const selected = selectedLabId === section.id}
 							<button
 								type="button"
-								onclick={() => onSetLab(selected ? null : section.id)}
+								onclick={() => { onSectionLeave(); onSetLab(selected ? null : section.id); }}
+								onmouseenter={() => { if (!selected) onSectionHover(section, 'lab'); }}
+								onmouseleave={onSectionLeave}
 								class="w-full text-left flex items-start gap-2 px-2 py-1.5 rounded-sm text-xs transition-colors hover:bg-muted/70"
 								class:bg-muted={selected}
 							>

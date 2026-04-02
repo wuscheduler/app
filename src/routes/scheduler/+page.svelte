@@ -10,7 +10,12 @@
 
 	// ── state ──────────────────────────────────────────────────────────────────
 
-	let highlightedCourseId = $state<string | null>(null);
+	interface HoveredSection {
+		courseId: string;
+		section: Section;
+		type: 'lecture' | 'lab';
+	}
+	let hoveredSection = $state<HoveredSection | null>(null);
 
 	// Resolved courses: selectedCourses ∩ catalog, with scheduler display state
 	const resolvedCourses = $derived.by(() => {
@@ -35,40 +40,69 @@
 	// Build calendar events from resolved courses + scheduler state
 	const calendarEvents = $derived.by<CalendarEvent[]>(() => {
 		const events: CalendarEvent[] = [];
+
+		function sectionToEvents(
+			courseId: string,
+			courseName: string,
+			section: Section,
+			type: 'lecture' | 'lab',
+			color: { bg: string; text: string },
+			ghost: boolean
+		) {
+			if (!section.days || !section.time) return;
+			const [startMin, endMin] = section.time;
+			for (const dayStr of section.days) {
+				const day = DAY_INDEX[dayStr];
+				if (day === undefined || day > 4) continue;
+				events.push({
+					courseId,
+					courseName,
+					sectionType: type,
+					sectionNumber: section.number,
+					instructor: section.instructor[0] ?? '',
+					day,
+					startMin,
+					endMin,
+					color,
+					ghost
+				});
+			}
+		}
+
+		// Regular (solid) events
 		for (const course of resolvedCourses) {
 			const entry = schedulerState.entries.get(course.id);
 			if (!entry || entry.hidden) continue;
 			const color = schedulerState.colorFor(course.id);
 
-			function sectionsToEvents(section: Section, type: 'lecture' | 'lab') {
-				if (!section.days || !section.time) return;
-				const [startMin, endMin] = section.time;
-				for (const dayStr of section.days) {
-					const day = DAY_INDEX[dayStr];
-					if (day === undefined || day > 4) continue; // skip weekend if not shown
-					events.push({
-						courseId: course.id,
-						courseName: course.catalogNumber,
-						sectionType: type,
-						sectionNumber: section.number,
-						instructor: section.instructor[0] ?? '',
-						day,
-						startMin,
-						endMin,
-						color
-					});
-				}
-			}
-
 			if (entry.selectedLectureId) {
 				const lec = course.sections.lecture.find((s) => s.id === entry.selectedLectureId);
-				if (lec) sectionsToEvents(lec, 'lecture');
+				if (lec) sectionToEvents(course.id, course.catalogNumber, lec, 'lecture', color, false);
 			}
 			if (entry.selectedLabId && course.sections.lab) {
 				const lab = course.sections.lab.find((s) => s.id === entry.selectedLabId);
-				if (lab) sectionsToEvents(lab, 'lab');
+				if (lab) sectionToEvents(course.id, course.catalogNumber, lab, 'lab', color, false);
 			}
 		}
+
+		// Ghost event for the hovered (unselected) section
+		if (hoveredSection) {
+			const { courseId, section, type } = hoveredSection;
+			const entry = schedulerState.entries.get(courseId);
+			const alreadySelected =
+				entry &&
+				(type === 'lecture'
+					? entry.selectedLectureId === section.id
+					: entry.selectedLabId === section.id);
+			if (!alreadySelected) {
+				const course = resolvedCourses.find((c) => c.id === courseId);
+				if (course) {
+					const color = schedulerState.colorFor(courseId);
+					sectionToEvents(courseId, course.catalogNumber, section, type, color, true);
+				}
+			}
+		}
+
 		return events;
 	});
 
@@ -150,13 +184,12 @@
 							hidden={entry.hidden}
 							selectedLectureId={entry.selectedLectureId}
 							selectedLabId={entry.selectedLabId}
-							{highlightedCourseId}
 							onSetLecture={(id) => schedulerState.setLecture(course.id, id)}
 							onSetLab={(id) => schedulerState.setLab(course.id, id)}
 							onToggleHidden={() => schedulerState.toggleHidden(course.id)}
 							onRemove={() => removeCourse(course.id)}
-							onMouseEnter={() => (highlightedCourseId = course.id)}
-							onMouseLeave={() => (highlightedCourseId = null)}
+							onSectionHover={(section, type) => (hoveredSection = { courseId: course.id, section, type })}
+							onSectionLeave={() => (hoveredSection = null)}
 						/>
 					{/if}
 				{/each}
@@ -179,7 +212,7 @@
 				</div>
 			</div>
 		{:else}
-			<WeekGrid events={calendarEvents} {highlightedCourseId} />
+			<WeekGrid events={calendarEvents} />
 		{/if}
 	</main>
 </div>

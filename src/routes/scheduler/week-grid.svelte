@@ -12,6 +12,7 @@
 		startMin: number;
 		endMin: number;
 		color: { bg: string; text: string };
+		ghost?: boolean;
 	}
 
 	interface LayoutEvent extends CalendarEvent {
@@ -21,10 +22,9 @@
 
 	interface Props {
 		events: CalendarEvent[];
-		highlightedCourseId: string | null;
 	}
 
-	let { events, highlightedCourseId }: Props = $props();
+	let { events }: Props = $props();
 
 	const HOUR_HEIGHT = 60; // px per hour = 1px per minute
 	const GRID_START = 7 * 60; // 7 AM
@@ -130,7 +130,7 @@
 				{/each}
 
 				<!-- Events -->
-				{#each byDay[dayIdx] as ev (ev.courseId + ev.sectionType + ev.day)}
+				{#each byDay[dayIdx] as ev (ev.courseId + ev.sectionType + ev.sectionNumber + ev.day)}
 					<WeekEvent
 						courseName={ev.courseName}
 						sectionType={ev.sectionType}
@@ -142,7 +142,7 @@
 						col={ev.col}
 						totalCols={ev.totalCols}
 						gridStartMin={GRID_START}
-						highlighted={highlightedCourseId === null || highlightedCourseId === ev.courseId}
+						ghost={ev.ghost ?? false}
 					/>
 				{/each}
 			</div>

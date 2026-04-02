@@ -12,7 +12,7 @@
 		col: number;
 		totalCols: number;
 		gridStartMin: number;
-		highlighted: boolean;
+		ghost: boolean;
 	}
 
 	let {
@@ -26,14 +26,13 @@
 		col,
 		totalCols,
 		gridStartMin,
-		highlighted
+		ghost
 	}: Props = $props();
 
 	const PIXELS_PER_MIN = 1; // 60px/hr → 1px/min
 
 	const top = $derived((startMin - gridStartMin) * PIXELS_PER_MIN);
 	const height = $derived(Math.max((endMin - startMin) * PIXELS_PER_MIN, 18));
-	const opacity = $derived(highlighted ? 1 : 0.88);
 </script>
 
 <div
@@ -43,9 +42,10 @@
 		height: {height}px;
 		left: calc(3px + (100% - 6px - {totalCols - 1} * 3px) / {totalCols} * {col} + 3px * {col});
 		width: calc((100% - 6px - {totalCols - 1} * 3px) / {totalCols});
-		background-color: {color.bg};
-		color: {color.text};
-		opacity: {opacity};
+		background-color: {ghost ? 'transparent' : color.bg};
+		color: {ghost ? color.bg : color.text};
+		border: {ghost ? `1.5px dashed ${color.bg}` : 'none'};
+		opacity: {ghost ? 0.75 : 1};
 	"
 >
 	<div class="px-1.5 py-0.5 h-full flex flex-col overflow-hidden leading-tight">
