@@ -30,7 +30,10 @@
 	const GRID_START = 7 * 60; // 7 AM
 	const GRID_END = 22 * 60; // 10 PM
 	const GRID_HEIGHT = GRID_END - GRID_START; // 900px
-	const HOURS = Array.from({ length: GRID_END / 60 - GRID_START / 60 }, (_, i) => i + GRID_START / 60);
+	const HOURS = Array.from(
+		{ length: GRID_END / 60 - GRID_START / 60 },
+		(_, i) => i + GRID_START / 60
+	);
 	const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
 	function layoutDay(dayEvents: CalendarEvent[]): LayoutEvent[] {
@@ -74,22 +77,24 @@
 	}
 </script>
 
-<div class="flex flex-col h-full">
+<div class="flex h-full flex-col">
 	<!-- Sticky day-name header -->
-	<div class="sticky top-0 z-10 flex border-b bg-background shrink-0">
+	<div class="sticky top-0 z-10 flex shrink-0 border-b bg-background">
 		<!-- Spacer for time sidebar -->
 		<div class="w-12 shrink-0 border-r border-transparent"></div>
 		{#each DAYS as day}
-			<div class="flex-1 py-2 text-center text-xs font-semibold text-muted-foreground tracking-wide uppercase border-l">
+			<div
+				class="flex-1 border-l py-2 text-center text-xs font-semibold tracking-wide text-muted-foreground uppercase"
+			>
 				{day}
 			</div>
 		{/each}
 	</div>
 
 	<!-- Scrollable grid body -->
-	<div class="flex overflow-y-auto flex-1">
+	<div class="flex flex-1 overflow-y-auto">
 		<!-- Time labels -->
-		<div class="w-12 shrink-0 relative" style="height: {GRID_HEIGHT}px">
+		<div class="relative w-12 shrink-0" style="height: {GRID_HEIGHT}px">
 			{#each HOURS as hour, i}
 				<div
 					class="absolute w-full"
@@ -97,7 +102,7 @@
 				>
 					{#if i > 0}
 						<span
-							class="absolute right-2 text-[10px] text-muted-foreground leading-none"
+							class="absolute right-2 text-[10px] leading-none text-muted-foreground"
 							style="top: -6px"
 						>
 							{hourLabel(hour)}
@@ -109,14 +114,11 @@
 
 		<!-- Day columns -->
 		{#each DAYS as _day, dayIdx}
-			<div
-				class="flex-1 relative border-l"
-				style="height: {GRID_HEIGHT}px; min-width: 0"
-			>
+			<div class="relative flex-1 border-l" style="height: {GRID_HEIGHT}px; min-width: 0">
 				<!-- Hour lines (solid) -->
 				{#each HOURS as _hour, i}
 					<div
-						class="absolute left-0 right-0 border-t border-border/60"
+						class="absolute right-0 left-0 border-t border-border/60"
 						style="top: {i * HOUR_HEIGHT}px"
 					></div>
 				{/each}
@@ -124,7 +126,7 @@
 				<!-- Half-hour lines (lighter) -->
 				{#each HOURS as _hour, i}
 					<div
-						class="absolute left-0 right-0 border-t border-border/25"
+						class="absolute right-0 left-0 border-t border-border/25"
 						style="top: {i * HOUR_HEIGHT + 30}px"
 					></div>
 				{/each}

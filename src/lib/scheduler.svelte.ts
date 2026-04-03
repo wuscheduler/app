@@ -8,7 +8,7 @@ export const SCHEDULE_COLORS = [
 	{ key: 'rose', bg: '#f43f5e', text: '#ffffff' },
 	{ key: 'sky', bg: '#0ea5e9', text: '#ffffff' },
 	{ key: 'teal', bg: '#14b8a6', text: '#ffffff' },
-	{ key: 'amber', bg: '#d97706', text: '#ffffff' },
+	{ key: 'amber', bg: '#d97706', text: '#ffffff' }
 ] as const;
 
 export type ScheduleColor = (typeof SCHEDULE_COLORS)[number];
@@ -88,13 +88,29 @@ export const schedulerState = {
 
 // Day string → Monday-based index (0=Mon … 4=Fri, 5=Sat, 6=Sun)
 export const DAY_INDEX: Record<string, number> = {
-	M: 0, Mon: 0, Monday: 0,
-	T: 1, Tu: 1, Tue: 1, Tuesday: 1,
-	W: 2, Wed: 2, Wednesday: 2,
-	Th: 3, Thu: 3, Thursday: 3, R: 3,
-	F: 4, Fri: 4, Friday: 4,
-	Sa: 5, Sat: 5, Saturday: 5,
-	Su: 6, Sun: 6, Sunday: 6
+	M: 0,
+	Mon: 0,
+	Monday: 0,
+	T: 1,
+	Tu: 1,
+	Tue: 1,
+	Tuesday: 1,
+	W: 2,
+	Wed: 2,
+	Wednesday: 2,
+	Th: 3,
+	Thu: 3,
+	Thursday: 3,
+	R: 3,
+	F: 4,
+	Fri: 4,
+	Friday: 4,
+	Sa: 5,
+	Sat: 5,
+	Saturday: 5,
+	Su: 6,
+	Sun: 6,
+	Sunday: 6
 };
 
 export function formatTime(minutes: number): string {
@@ -107,13 +123,29 @@ export function formatTime(minutes: number): string {
 
 export function formatDays(days: string[]): string {
 	const abbrev: Record<string, string> = {
-		M: 'M', Mon: 'M', Monday: 'M',
-		T: 'T', Tu: 'T', Tue: 'T', Tuesday: 'T',
-		W: 'W', Wed: 'W', Wednesday: 'W',
-		Th: 'Th', Thu: 'Th', Thursday: 'Th', R: 'Th',
-		F: 'F', Fri: 'F', Friday: 'F',
-		Sa: 'Sa', Sat: 'Sa', Saturday: 'Sa',
-		Su: 'Su', Sun: 'Su', Sunday: 'Su'
+		M: 'M',
+		Mon: 'M',
+		Monday: 'M',
+		T: 'T',
+		Tu: 'T',
+		Tue: 'T',
+		Tuesday: 'T',
+		W: 'W',
+		Wed: 'W',
+		Wednesday: 'W',
+		Th: 'Th',
+		Thu: 'Th',
+		Thursday: 'Th',
+		R: 'Th',
+		F: 'F',
+		Fri: 'F',
+		Friday: 'F',
+		Sa: 'Sa',
+		Sat: 'Sa',
+		Saturday: 'Sa',
+		Su: 'Su',
+		Sun: 'Su',
+		Sunday: 'Su'
 	};
 	return days.map((d) => abbrev[d] ?? d).join('');
 }

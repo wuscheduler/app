@@ -39,7 +39,7 @@
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
-	class="absolute overflow-hidden rounded-[3px] select-none transition-opacity"
+	class="absolute overflow-hidden rounded-[3px] transition-opacity select-none"
 	class:cursor-pointer={!ghost && onclick}
 	class:cursor-default={ghost || !onclick}
 	role={!ghost && onclick ? 'button' : undefined}
@@ -57,16 +57,18 @@
 		opacity: {ghost ? 0.75 : 1};
 	"
 >
-	<div class="px-1.5 py-0.5 h-full flex flex-col overflow-hidden leading-tight">
-		<span class="font-semibold text-[11px] truncate">{courseName}</span>
+	<div class="flex h-full flex-col overflow-hidden px-1.5 py-0.5 leading-tight">
+		<span class="truncate text-[11px] font-semibold">{courseName}</span>
 		{#if height > 28}
-			<span class="text-[10px] opacity-90 truncate capitalize">{sectionType} {sectionNumber}</span>
+			<span class="truncate text-[10px] capitalize opacity-90"
+				>{sectionType} {sectionNumber}</span
+			>
 		{/if}
 		{#if height > 44 && instructor}
-			<span class="text-[10px] opacity-80 truncate">{instructor}</span>
+			<span class="truncate text-[10px] opacity-80">{instructor}</span>
 		{/if}
 		{#if height > 58}
-			<span class="text-[10px] opacity-80 truncate mt-auto">
+			<span class="mt-auto truncate text-[10px] opacity-80">
 				{formatTime(startMin)} – {formatTime(endMin)}
 			</span>
 		{/if}

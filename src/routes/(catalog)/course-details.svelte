@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Course, Section } from '$lib/types';
+	import type { Course } from '$lib/types';
 	import XIcon from '@lucide/svelte/icons/x';
 	import CourseSection from './course-section.svelte';
 

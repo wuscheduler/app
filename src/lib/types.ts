@@ -15,7 +15,7 @@ export interface Course {
 	department: string;
 	title: string;
 	catalogNumber: string;
-	number: number,
+	number: number;
 	units: number | null;
 	sections: {
 		lecture: Section[];

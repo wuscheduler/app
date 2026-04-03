@@ -44,7 +44,8 @@
 	function sectionLabel(section: Section): string {
 		const parts: string[] = [];
 		if (section.days && section.days.length > 0) parts.push(formatDays(section.days));
-		if (section.time) parts.push(`${formatTime(section.time[0])}–${formatTime(section.time[1])}`);
+		if (section.time)
+			parts.push(`${formatTime(section.time[0])}–${formatTime(section.time[1])}`);
 		if (section.instructor.length > 0) parts.push(section.instructor[0]);
 		return parts.join(' · ');
 	}
@@ -53,26 +54,28 @@
 <div role="listitem">
 	<!-- Course card header -->
 	<div
-		class="flex items-stretch rounded-md overflow-hidden border bg-card transition-colors"
+		class="flex items-stretch overflow-hidden rounded-md border bg-card transition-colors"
 		class:opacity-50={hidden}
 	>
 		<!-- Color strip -->
 		<div class="w-1 shrink-0" style="background-color: {color.bg}"></div>
 
 		<!-- Main content -->
-		<div class="flex-1 min-w-0 px-3 py-2">
+		<div class="min-w-0 flex-1 px-3 py-2">
 			<div class="flex items-center justify-between gap-1">
 				<div class="min-w-0">
-					<div class="font-semibold text-sm leading-tight truncate">{course.catalogNumber}</div>
-					<div class="text-xs text-muted-foreground truncate">{course.title}</div>
+					<div class="truncate text-sm leading-tight font-semibold">
+						{course.catalogNumber}
+					</div>
+					<div class="truncate text-xs text-muted-foreground">{course.title}</div>
 				</div>
 
 				<!-- Actions -->
-				<div class="flex items-center gap-0.5 shrink-0">
+				<div class="flex shrink-0 items-center gap-0.5">
 					<button
 						type="button"
 						onclick={onViewDetails}
-						class="p-1 rounded-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+						class="rounded-sm p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
 						title="View course details"
 					>
 						<InfoIcon class="h-3.5 w-3.5" />
@@ -80,7 +83,7 @@
 					<button
 						type="button"
 						onclick={onToggleHidden}
-						class="p-1 rounded-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+						class="rounded-sm p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
 						title={hidden ? 'Show on schedule' : 'Hide from schedule'}
 					>
 						{#if hidden}
@@ -92,7 +95,7 @@
 					<button
 						type="button"
 						onclick={onRemove}
-						class="p-1 rounded-sm text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+						class="rounded-sm p-1 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
 						title="Remove course"
 					>
 						<XIcon class="h-3.5 w-3.5" />
@@ -100,7 +103,7 @@
 					<button
 						type="button"
 						onclick={() => (expanded = !expanded)}
-						class="p-1 rounded-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+						class="rounded-sm p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
 						title={expanded ? 'Collapse sections' : 'Expand sections'}
 					>
 						{#if expanded}
@@ -114,9 +117,11 @@
 
 			<!-- Collapsed summary -->
 			{#if !expanded}
-				<div class="mt-1 text-[10px] text-muted-foreground space-y-0.5">
+				<div class="mt-1 space-y-0.5 text-[10px] text-muted-foreground">
 					{#if selectedLectureId}
-						{@const lec = course.sections.lecture.find((s) => s.id === selectedLectureId)}
+						{@const lec = course.sections.lecture.find(
+							(s) => s.id === selectedLectureId
+						)}
 						{#if lec}
 							<div class="truncate">
 								Lec {lec.number}{lec.days ? ' · ' + formatDays(lec.days) : ''}
@@ -140,12 +145,13 @@
 
 	<!-- Expanded section picker -->
 	{#if expanded}
-		<div class="mt-1 ml-1 pl-3 border-l-2 space-y-3 pb-1" style="border-color: {color.bg}40">
-
+		<div class="mt-1 ml-1 space-y-3 border-l-2 pb-1 pl-3" style="border-color: {color.bg}40">
 			<!-- Lecture sections -->
 			{#if course.sections.lecture.length > 0}
 				<div>
-					<div class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+					<div
+						class="mb-1 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase"
+					>
 						Lecture
 					</div>
 					<div class="space-y-0.5">
@@ -153,25 +159,33 @@
 							{@const selected = selectedLectureId === section.id}
 							<button
 								type="button"
-								onclick={() => { onSectionLeave(); onSetLecture(selected ? null : section.id); }}
-								onmouseenter={() => { if (!selected) onSectionHover(section, 'lecture'); }}
+								onclick={() => {
+									onSectionLeave();
+									onSetLecture(selected ? null : section.id);
+								}}
+								onmouseenter={() => {
+									if (!selected) onSectionHover(section, 'lecture');
+								}}
 								onmouseleave={onSectionLeave}
-								class="w-full text-left flex items-start gap-2 px-2 py-1.5 rounded-sm text-xs transition-colors hover:bg-muted/70"
+								class="flex w-full items-start gap-2 rounded-sm px-2 py-1.5 text-left text-xs transition-colors hover:bg-muted/70"
 								class:bg-muted={selected}
 							>
 								<!-- Radio dot -->
 								<div
-									class="mt-0.5 w-3 h-3 rounded-full border-2 shrink-0 flex items-center justify-center"
+									class="mt-0.5 flex h-3 w-3 shrink-0 items-center justify-center rounded-full border-2"
 									style="border-color: {color.bg}"
 								>
 									{#if selected}
-										<div class="w-1.5 h-1.5 rounded-full" style="background-color: {color.bg}"></div>
+										<div
+											class="h-1.5 w-1.5 rounded-full"
+											style="background-color: {color.bg}"
+										></div>
 									{/if}
 								</div>
 								<div class="min-w-0">
 									<span class="font-medium">{section.number}</span>
 									{#if section.days || section.time || section.instructor.length}
-										<div class="text-[10px] text-muted-foreground truncate">
+										<div class="truncate text-[10px] text-muted-foreground">
 											{sectionLabel(section)}
 										</div>
 									{/if}
@@ -185,7 +199,9 @@
 			<!-- Lab sections -->
 			{#if course.sections.lab && course.sections.lab.length > 0}
 				<div>
-					<div class="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+					<div
+						class="mb-1 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase"
+					>
 						Lab
 					</div>
 					<div class="space-y-0.5">
@@ -193,24 +209,32 @@
 							{@const selected = selectedLabId === section.id}
 							<button
 								type="button"
-								onclick={() => { onSectionLeave(); onSetLab(selected ? null : section.id); }}
-								onmouseenter={() => { if (!selected) onSectionHover(section, 'lab'); }}
+								onclick={() => {
+									onSectionLeave();
+									onSetLab(selected ? null : section.id);
+								}}
+								onmouseenter={() => {
+									if (!selected) onSectionHover(section, 'lab');
+								}}
 								onmouseleave={onSectionLeave}
-								class="w-full text-left flex items-start gap-2 px-2 py-1.5 rounded-sm text-xs transition-colors hover:bg-muted/70"
+								class="flex w-full items-start gap-2 rounded-sm px-2 py-1.5 text-left text-xs transition-colors hover:bg-muted/70"
 								class:bg-muted={selected}
 							>
 								<div
-									class="mt-0.5 w-3 h-3 rounded-full border-2 shrink-0 flex items-center justify-center"
+									class="mt-0.5 flex h-3 w-3 shrink-0 items-center justify-center rounded-full border-2"
 									style="border-color: {color.bg}"
 								>
 									{#if selected}
-										<div class="w-1.5 h-1.5 rounded-full" style="background-color: {color.bg}"></div>
+										<div
+											class="h-1.5 w-1.5 rounded-full"
+											style="background-color: {color.bg}"
+										></div>
 									{/if}
 								</div>
 								<div class="min-w-0">
 									<span class="font-medium">{section.number}</span>
 									{#if section.days || section.time || section.instructor.length}
-										<div class="text-[10px] text-muted-foreground truncate">
+										<div class="truncate text-[10px] text-muted-foreground">
 											{sectionLabel(section)}
 										</div>
 									{/if}
