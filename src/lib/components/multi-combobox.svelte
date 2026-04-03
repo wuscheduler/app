@@ -6,6 +6,7 @@
 	import CheckIcon from '@lucide/svelte/icons/check';
 	import ChevronsUpDownIcon from '@lucide/svelte/icons/chevrons-up-down';
 	import XIcon from '@lucide/svelte/icons/x';
+	import SvelteVirtualList from '@humanspeak/svelte-virtual-list';
 
 	interface Props {
 		label: string;
@@ -29,6 +30,17 @@
 
 	let popoverOpen = $state(false);
 	let triggerRef = $state<HTMLButtonElement>(null!);
+	let searchValue = $state('');
+
+	let filteredItems = $derived(
+		searchValue
+			? items.filter((item) => item.toLowerCase().includes(searchValue.toLowerCase()))
+			: items
+	);
+
+	$effect(() => {
+		if (!popoverOpen) searchValue = '';
+	});
 
 	function toggleItem(item: string) {
 		if (value.includes(item)) {
@@ -67,23 +79,26 @@
 		</Popover.Trigger>
 
 		<Popover.Content class="w-[240px] p-0">
-			<Command.Root>
-				<Command.Input placeholder={searchPlaceholder} />
-				<Command.List>
-					<Command.Empty>{emptyMessage}</Command.Empty>
-					<Command.Group>
-						{#each items as item (item)}
-							<Command.Item value={item} onSelect={() => toggleItem(item)}>
-								<CheckIcon
-									class={cn(
-										'mr-2 h-4 w-4',
-										!value.includes(item) && 'text-transparent'
-									)}
-								/>
-								{item}
-							</Command.Item>
-						{/each}
-					</Command.Group>
+			<Command.Root shouldFilter={false}>
+				<Command.Input placeholder={searchPlaceholder} bind:value={searchValue} />
+				<Command.List class="h-[200px] overflow-hidden">
+					{#if filteredItems.length === 0}
+						<Command.Empty>{emptyMessage}</Command.Empty>
+					{:else}
+						<SvelteVirtualList items={filteredItems}>
+							{#snippet renderItem(item)}
+								<Command.Item value={item} onSelect={() => toggleItem(item)}>
+									<CheckIcon
+										class={cn(
+											'mr-2 h-4 w-4',
+											!value.includes(item) && 'text-transparent'
+										)}
+									/>
+									{item}
+								</Command.Item>
+							{/snippet}
+						</SvelteVirtualList>
+					{/if}
 				</Command.List>
 			</Command.Root>
 		</Popover.Content>
