@@ -13,6 +13,7 @@
 		totalCols: number;
 		gridStartMin: number;
 		ghost: boolean;
+		onclick?: () => void;
 	}
 
 	let {
@@ -26,7 +27,8 @@
 		col,
 		totalCols,
 		gridStartMin,
-		ghost
+		ghost,
+		onclick
 	}: Props = $props();
 
 	const PIXELS_PER_MIN = 1; // 60px/hr → 1px/min
@@ -35,8 +37,15 @@
 	const height = $derived(Math.max((endMin - startMin) * PIXELS_PER_MIN, 18));
 </script>
 
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
-	class="absolute overflow-hidden rounded-[3px] cursor-default select-none transition-opacity"
+	class="absolute overflow-hidden rounded-[3px] select-none transition-opacity"
+	class:cursor-pointer={!ghost && onclick}
+	class:cursor-default={ghost || !onclick}
+	role={!ghost && onclick ? 'button' : undefined}
+	tabindex={!ghost && onclick ? 0 : undefined}
+	onkeydown={!ghost && onclick ? (e) => e.key === 'Enter' && onclick?.() : undefined}
+	onclick={!ghost ? onclick : undefined}
 	style="
 		top: {top}px;
 		height: {height}px;

@@ -7,6 +7,7 @@
 	import XIcon from '@lucide/svelte/icons/x';
 	import ChevronDownIcon from '@lucide/svelte/icons/chevron-down';
 	import ChevronRightIcon from '@lucide/svelte/icons/chevron-right';
+	import InfoIcon from '@lucide/svelte/icons/info';
 
 	interface Props {
 		course: Course;
@@ -18,6 +19,7 @@
 		onSetLab: (id: string | null) => void;
 		onToggleHidden: () => void;
 		onRemove: () => void;
+		onViewDetails: () => void;
 		onSectionHover: (section: Section, type: 'lecture' | 'lab') => void;
 		onSectionLeave: () => void;
 	}
@@ -32,6 +34,7 @@
 		onSetLab,
 		onToggleHidden,
 		onRemove,
+		onViewDetails,
 		onSectionHover,
 		onSectionLeave
 	}: Props = $props();
@@ -66,6 +69,14 @@
 
 				<!-- Actions -->
 				<div class="flex items-center gap-0.5 shrink-0">
+					<button
+						type="button"
+						onclick={onViewDetails}
+						class="p-1 rounded-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+						title="View course details"
+					>
+						<InfoIcon class="h-3.5 w-3.5" />
+					</button>
 					<button
 						type="button"
 						onclick={onToggleHidden}

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import WeekEvent from './week-event.svelte';
-	import { formatTime } from '$lib/scheduler.svelte';
 
 	export interface CalendarEvent {
 		courseId: string;
@@ -22,9 +21,10 @@
 
 	interface Props {
 		events: CalendarEvent[];
+		onEventClick?: (courseId: string) => void;
 	}
 
-	let { events }: Props = $props();
+	let { events, onEventClick }: Props = $props();
 
 	const HOUR_HEIGHT = 60; // px per hour = 1px per minute
 	const GRID_START = 7 * 60; // 7 AM
@@ -143,6 +143,7 @@
 						totalCols={ev.totalCols}
 						gridStartMin={GRID_START}
 						ghost={ev.ghost ?? false}
+						onclick={onEventClick ? () => onEventClick(ev.courseId) : undefined}
 					/>
 				{/each}
 			</div>
