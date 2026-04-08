@@ -65,6 +65,11 @@
 					<p class="mt-1 text-sm text-muted-foreground">{course.description}</p>
 				</div>
 			{/if}
+			<div class="pt-2">
+				{#each Object.entries(course.attributes) as [school, tags]}
+					<span class="text-sm font-medium">{school}: </span> <span class="text-sm text-muted-foreground">{tags.join(", ")}</span><br/>
+				{/each}
+			</div>
 		</div>
 
 		<!-- Sections -->
