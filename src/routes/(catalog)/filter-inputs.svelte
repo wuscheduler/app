@@ -4,6 +4,7 @@
 		school: string | undefined;
 		department: string | undefined;
 		instructors: string[];
+		attributes: string[];
 		level: 'Graduate' | 'Undergraduate' | undefined;
 		search: string;
 	}
@@ -28,6 +29,7 @@
 			school: undefined,
 			department: undefined,
 			instructors: [],
+			attributes: [],
 			level: undefined,
 			search: ''
 		}),
@@ -44,6 +46,9 @@
 	let schools = $derived(Object.keys(catalogState.catalog?.schools || {}));
 	let departments = $derived(
 		filters.school ? catalogState.catalog?.schools[filters.school] : undefined
+	);
+	let allAttributes = $derived(
+		[...new Set(catalogState.courses.flatMap((c) => [...(c.attributesFlat ?? [])]))].sort()
 	);
 
 	$effect(() => {
@@ -95,6 +100,13 @@
 	placeholder="Select instructors..."
 	items={instructors || []}
 	bind:value={filters.instructors}
+></MultiCombobox>
+
+<MultiCombobox
+	label="Attributes"
+	placeholder="Select attributes..."
+	items={allAttributes}
+	bind:value={filters.attributes}
 ></MultiCombobox>
 
 <p class="text-sm text-muted-foreground">

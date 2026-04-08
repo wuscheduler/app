@@ -23,7 +23,8 @@ export interface Course {
 	};
 	description: string;
 	level: string;
-	attributes: Record<string, string[]>
+	attributes: Record<string, string[]>,
+	attributesFlat: Set<string>
 }
 
 export interface Catalog {

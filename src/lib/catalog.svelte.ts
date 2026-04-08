@@ -50,6 +50,11 @@ const loadTerm = async (term: string) => {
 		for (const course of data.courses) {
 			const s = course.catalogNumber;
 			course.number = Number(s.slice(s.lastIndexOf(' ') + 1)) || 0;
+			course.attributesFlat = new Set(Object.entries(course.attributes).flatMap(([school, tags]) =>
+				tags.map((tag) => `${school} — ${tag}`)
+			));
+
+			console.log(course.attributesFlat)
 		}
 	} catch (e) {
 		error = (e as Error).message;

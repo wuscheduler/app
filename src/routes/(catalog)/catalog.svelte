@@ -19,6 +19,7 @@
 		school: undefined,
 		department: undefined,
 		instructors: [],
+		attributes: [],
 		level: undefined,
 		search: ''
 	});
@@ -49,8 +50,13 @@
 		);
 		return courses.filter((c) => ids.has(c.id));
 	});
-	let coursesFilteredSearch = $derived.by(() => {
+	let coursesFilteredAttributes = $derived.by(() => {
 		const courses = coursesFilteredInstructors;
+		if (!filters.attributes || filters.attributes.length === 0) return courses;
+		return courses.filter((c) => filters.attributes.every((a) => c.attributesFlat?.has(a)));
+	});
+	let coursesFilteredSearch = $derived.by(() => {
+		const courses = coursesFilteredAttributes;
 		if (!filters.search) return courses;
 		const s = filters.search.toLowerCase();
 		return courses.filter(
