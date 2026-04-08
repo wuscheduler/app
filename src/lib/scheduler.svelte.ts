@@ -8,7 +8,6 @@ export const SCHEDULE_COLORS = [
 	{ key: 'rose', bg: '#f43f5e', text: '#ffffff' },
 	{ key: 'sky', bg: '#0ea5e9', text: '#ffffff' },
 	{ key: 'teal', bg: '#14b8a6', text: '#ffffff' },
-	{ key: 'amber', bg: '#d97706', text: '#ffffff' }
 ] as const;
 
 export type ScheduleColor = (typeof SCHEDULE_COLORS)[number];
