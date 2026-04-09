@@ -4,7 +4,7 @@
 
 <nav class="w-full bg-white shadow-sm">
 	<div class="flex items-center justify-between px-4 py-3">
-		<div class="text-xl font-bold">BearSched</div>
+		<div class="text-xl font-bold"><a href="/">BearSched</a></div>
 
 		<NavigationMenu.Root>
 			<NavigationMenu.List class="flex">
