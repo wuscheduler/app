@@ -21,7 +21,8 @@
 		instructors: [],
 		attributes: [],
 		level: undefined,
-		search: ''
+		search: '',
+		credits: undefined
 	});
 
 	let catalogLastUpdated = $derived(catalogState.catalog?.lastUpdated || 0);
@@ -55,8 +56,14 @@
 		if (!filters.attributes || filters.attributes.length === 0) return courses;
 		return courses.filter((c) => filters.attributes.every((a) => c.attributesFlat?.has(a)));
 	});
-	let coursesFilteredSearch = $derived.by(() => {
+	let coursesFilteredCredits = $derived.by(() => {
 		const courses = coursesFilteredAttributes;
+		if (!filters.credits) return courses;
+		const [lo, hi] = filters.credits;
+		return courses.filter((c) => c.units !== null && c.units >= lo && c.units <= hi);
+	});
+	let coursesFilteredSearch = $derived.by(() => {
+		const courses = coursesFilteredCredits;
 		if (!filters.search) return courses;
 		const s = filters.search.toLowerCase();
 		return courses.filter(

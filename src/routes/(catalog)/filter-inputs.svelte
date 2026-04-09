@@ -7,6 +7,7 @@
 		attributes: string[];
 		level: 'Graduate' | 'Undergraduate' | undefined;
 		search: string;
+		credits: [number, number] | undefined;
 	}
 </script>
 
@@ -15,6 +16,7 @@
 	import FilterCombobox from '$lib/components/filter-combobox.svelte';
 	import MultiCombobox from '$lib/components/multi-combobox.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
+	import { Slider } from '$lib/components/ui/slider';
 	import { getRelativeTimeString } from '$lib/utils';
 
 	interface Props {
@@ -31,7 +33,8 @@
 			instructors: [],
 			attributes: [],
 			level: undefined,
-			search: ''
+			search: '',
+			credits: undefined
 		}),
 
 		mobile = undefined,
@@ -50,6 +53,29 @@
 	let allAttributes = $derived(
 		[...new Set(catalogState.courses.flatMap((c) => [...(c.attributesFlat ?? [])]))].sort()
 	);
+	let maxCredits = $derived(
+		Math.max(...catalogState.courses.map((c) => c.units ?? 0).filter((u) => u > 0), 6)
+	);
+
+	let creditSliderValue = $state<[number, number]>([0, 6]);
+	let creditSliderInitialized = $state(false);
+
+	$effect(() => {
+		// Initialize slider to full range once catalog is loaded
+		if (!creditSliderInitialized && maxCredits > 0) {
+			creditSliderValue = [0, maxCredits];
+			creditSliderInitialized = true;
+		}
+	});
+
+	$effect(() => {
+		const [lo, hi] = creditSliderValue;
+		if (lo === 0 && hi === maxCredits) {
+			filters.credits = undefined;
+		} else {
+			filters.credits = [lo, hi];
+		}
+	});
 
 	$effect(() => {
 		if (filters.department && (!departments || !departments.includes(filters.department))) {
@@ -108,6 +134,20 @@
 	items={allAttributes}
 	bind:value={filters.attributes}
 ></MultiCombobox>
+
+<div class="mb-4">
+	<div class="mb-2 flex items-center justify-between">
+		<span class="text-sm font-medium">Credits</span>
+		{#if creditSliderValue && (creditSliderValue[0] !== 0 || creditSliderValue[1] !== maxCredits)}
+			<span class="text-sm text-muted-foreground"
+				>{creditSliderValue[0]}-{creditSliderValue[1]}</span
+			>
+		{:else}
+			<span class="text-sm text-muted-foreground">Any</span>
+		{/if}
+	</div>
+	<Slider type="multiple" min={0} max={maxCredits} step={1} bind:value={creditSliderValue} />
+</div>
 
 <p class="text-sm text-muted-foreground">
 	Last updated {getRelativeTimeString(catalogLastUpdated)}
