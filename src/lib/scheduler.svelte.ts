@@ -7,20 +7,30 @@ export const SCHEDULE_COLORS = [
 	{ key: 'orange', bg: '#f97316', text: '#ffffff' },
 	{ key: 'rose', bg: '#f43f5e', text: '#ffffff' },
 	{ key: 'sky', bg: '#0ea5e9', text: '#ffffff' },
-	{ key: 'teal', bg: '#14b8a6', text: '#ffffff' },
+	{ key: 'teal', bg: '#14b8a6', text: '#ffffff' }
 ] as const;
 
 export type ScheduleColor = (typeof SCHEDULE_COLORS)[number];
 
 export interface CourseEntry {
-	colorIndex: number;
+	colorIndex: number; // Not used, but retained for backward compat with old version.
 	hidden: boolean;
 	selectedLectureId: string | null;
 	selectedLabId: string | null;
 }
 
-let colorCounter = $state(0);
 const entries = new SvelteMap<string, CourseEntry>();
+
+function nextColorIndex(): number {
+	const used = new Set([...entries.values()].map((e) => e.colorIndex));
+	for (let i = 0; i < SCHEDULE_COLORS.length; i++) {
+		if (!used.has(i)) return i;
+	}
+	// All colors in use — pick the least-used one
+	const counts = new Array(SCHEDULE_COLORS.length).fill(0);
+	for (const e of entries.values()) counts[e.colorIndex]++;
+	return counts.indexOf(Math.min(...counts));
+}
 
 export const schedulerState = {
 	get entries() {
@@ -34,10 +44,8 @@ export const schedulerState = {
 
 	ensureEntry(courseId: string, defaultLectureId: string | null, defaultLabId: string | null) {
 		if (!entries.has(courseId)) {
-			const idx = colorCounter % SCHEDULE_COLORS.length;
-			colorCounter++;
 			entries.set(courseId, {
-				colorIndex: idx,
+				colorIndex: nextColorIndex(),
 				hidden: false,
 				selectedLectureId: defaultLectureId,
 				selectedLabId: defaultLabId
@@ -65,16 +73,12 @@ export const schedulerState = {
 	},
 
 	serialize(): string {
-		return JSON.stringify({
-			colorCounter,
-			entries: Object.fromEntries(entries)
-		});
+		return JSON.stringify({ entries: Object.fromEntries(entries) });
 	},
 
 	deserialize(raw: string) {
 		try {
 			const data = JSON.parse(raw);
-			colorCounter = data.colorCounter ?? 0;
 			entries.clear();
 			for (const [id, entry] of Object.entries(data.entries ?? {})) {
 				entries.set(id, entry as CourseEntry);
