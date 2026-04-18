@@ -28,6 +28,7 @@
 
 	let catalogLastUpdated = $derived(catalogState.catalog?.lastUpdated || 0);
 	let selectedCourse = $state<Course | null>(null);
+	let pendingCourseId = $state<string | null>(null);
 
 	// Chained derived's reduce redundant calculations
 	let baseCourses = $derived(catalogState.courses);
@@ -74,12 +75,16 @@
 	let courses: Course[] = $derived(coursesFilteredSearch);
 
 	onMount(async () => {
-		const json = new URLSearchParams(window.location.search).get('filters');
+		const params = new URLSearchParams(window.location.search);
+		const urlJson = params.get('filters');
+		const localJson = localStorage.getItem('catalogFilters');
+		const json = urlJson ?? localJson;
 		if (json) {
 			try {
 				Object.assign(filters, JSON.parse(json));
 			} catch {}
 		}
+		pendingCourseId = params.get('course');
 
 		await catalogState.loadIndex();
 
@@ -95,8 +100,27 @@
 	});
 
 	$effect(() => {
+		const serialized = JSON.stringify(filters);
+		localStorage.setItem('catalogFilters', serialized);
 		const url = new URL(window.location.href);
-		url.searchParams.set('filters', JSON.stringify(filters));
+		url.searchParams.set('filters', serialized);
+		history.replaceState(history.state, '', url.toString());
+	});
+
+	$effect(() => {
+		if (pendingCourseId && catalogState.courses.length > 0) {
+			selectedCourse = catalogState.courses.find((c) => c.id === pendingCourseId) ?? null;
+			pendingCourseId = null;
+		}
+	});
+
+	$effect(() => {
+		const url = new URL(window.location.href);
+		if (selectedCourse) {
+			url.searchParams.set('course', selectedCourse.id);
+		} else {
+			url.searchParams.delete('course');
+		}
 		history.replaceState(history.state, '', url.toString());
 	});
 </script>
