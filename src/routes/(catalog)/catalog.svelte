@@ -13,8 +13,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import type { Course } from '$lib/types';
 	import SvelteVirtualList from '@humanspeak/svelte-virtual-list';
-
-	let filters = $state<FilterData>({
+	const defaultFilters: FilterData = {
 		term: undefined,
 		school: undefined,
 		department: undefined,
@@ -23,7 +22,9 @@
 		level: undefined,
 		search: '',
 		credits: undefined
-	});
+	};
+
+	let filters = $state<FilterData>({ ...defaultFilters });
 
 	let catalogLastUpdated = $derived(catalogState.catalog?.lastUpdated || 0);
 	let selectedCourse = $state<Course | null>(null);
@@ -73,9 +74,16 @@
 	let courses: Course[] = $derived(coursesFilteredSearch);
 
 	onMount(async () => {
+		const json = new URLSearchParams(window.location.search).get('filters');
+		if (json) {
+			try {
+				Object.assign(filters, JSON.parse(json));
+			} catch {}
+		}
+
 		await catalogState.loadIndex();
 
-		if (catalogState.index) {
+		if (catalogState.index && !filters.term) {
 			filters.term = catalogState.index.terms[0];
 		}
 	});
@@ -84,6 +92,12 @@
 		if (filters.term && catalogState.term !== filters.term) {
 			catalogState.loadTerm(filters.term);
 		}
+	});
+
+	$effect(() => {
+		const url = new URL(window.location.href);
+		url.searchParams.set('filters', JSON.stringify(filters));
+		history.replaceState(history.state, '', url.toString());
 	});
 </script>
 
