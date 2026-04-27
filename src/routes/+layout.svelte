@@ -24,7 +24,7 @@
 	});
 </script>
 
-<svelte:head><link rel="icon" href={favicon} /></svelte:head>
+<svelte:head><link rel="icon" href={favicon} /><title>BearSched</title></svelte:head>
 
 <div class="page">
 	<Navbar></Navbar>
