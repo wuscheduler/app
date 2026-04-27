@@ -125,9 +125,9 @@
 	});
 </script>
 
-{#if catalogState.loading}
+{#if catalogState.loading || !catalogState.catalog}
 	<Loader />
-{:else if catalogState.error || !catalogState.catalog}
+{:else if catalogState.error}
 	An error occurred: {catalogState.error}
 {:else}
 	<div class="flex h-full flex-col lg:flex-row">
